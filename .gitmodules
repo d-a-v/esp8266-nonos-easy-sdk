@@ -1,0 +1,9 @@
+[submodule "esp-open-sdk"]
+	path = esp-open-sdk
+	url = https://github.com/pfalcon/esp-open-sdk
+[submodule "esptool"]
+	path = esptool
+	url = https://github.com/espressif/esptool/
+[submodule "ESP8266_NONOS_SDK"]
+	path = ESP8266_NONOS_SDK
+	url = https://github.com/espressif/ESP8266_NONOS_SDK
