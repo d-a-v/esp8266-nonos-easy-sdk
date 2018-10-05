@@ -30,15 +30,15 @@ blank2 = $(shell printf "0x%08X" $$(($(base) + 0xE000)))
 			        && $(MAKE) $(OPTIONS) \
 			        && build=../../../builds/$$i \
 			        && mkdir -p $${build} \
-			        && cp ../bin/eagle.flash.bin      $${build}/0x000000 \
-			        && cp ../bin/eagle.irom0text.bin  $${build}/0x010000 \
+			        && cp ../bin/eagle.flash.bin      $${build}/0x0 \
+			        && cp ../bin/eagle.irom0text.bin  $${build}/0x10000 \
 			        && cp ../bin/blank.bin            $${build}/$(blank1) \
 			        && cp ../bin/$(default)           $${build}/$(init) \
 			        && cp ../bin/blank.bin            $${build}/$(blank2) \
 			        && cp .output/eagle/debug/image/eagle.app.v6.out $${build}/$$i.elf \
 			        && echo "esptool.py write_flash --flash_freq $(TOOLSPI) --flash_mode `echo $(SPIMODE) | tr A-Z a-z` \$$(for j in 0x*; do echo -n \"\$$j \$$j \"; done)" > $${build}/runme-flashme \
 			        && echo "esptool.py erase_flash" > $${build}/runme-flasherase \
-			        && echo "blank: $(blank1) & $(blank2)\n$(init): $(init)\neagle.flash.bin: 0x000000\neagle.irom0text.bin: 0x010000\naccording to 4.1.2 in 2a-esp8266-sdk_getting_started_guide_en.pdf" > $${build}/map.txt \
+			        && echo "blank: $(blank1) & $(blank2)\n$(default): $(init)\neagle.flash.bin: 0x0\neagle.irom0text.bin: 0x10000\naccording to 4.1.2 in 2a-esp8266-sdk_getting_started_guide_en.pdf" > $${build}/map.txt \
 			        && chmod +x $${build}/runme-* \
 			        && chmod -x $${build}/0x* \
 			        ;true ) \

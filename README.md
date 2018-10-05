@@ -17,9 +17,10 @@ the 'make flash' command.
 
 # Current status
 
-*only SDK examples are built for 4MBytes chips in non-ota mode.*
+*non-OTA mode (no boot) only*
+*builds nonos-sdk examples only*
 
-# test it
+# use it
 
 clone this repository, then type
 ```
