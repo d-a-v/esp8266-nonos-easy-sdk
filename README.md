@@ -17,9 +17,7 @@ the 'make flash' command.
 
 # Current status
 
-*non-OTA mode (no boot) only*
-
-*builds nonos-sdk examples only*
+*builds nonos-sdk examples only (ota / non-ota)*
 
 # Use it
 
