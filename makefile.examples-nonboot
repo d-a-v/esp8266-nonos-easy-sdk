@@ -1,0 +1,37 @@
+
+# flash map from 2a-esp8266-sdk_getting_started_guide_en.pdf (non boot mode)
+
+# Binaries
+#                              512     1024     2048     4096     8192  16*1024
+# blank.bin                  0x7B000 0xFB000 0x1FB000 0x3FB000 0x7FB000 0xFFB000
+# esp_init_data_default.bin  0x7C000 0xFC000 0x1FC000 0x3FC000 0x7FC000 0xFFC000
+# blank.bin                  0x7E000 0xFE000 0x1FE000 0x3FE000 0x7FE000 0xFFE000
+# eagle.flash.bin                                 0x00000
+# eagle.irom0text.bin                             0x10000
+
+
+GENMISC = "2\n0\n2\n3\n4\n" # nonboot / eagle / spi40Mhz / DOUT / 4MBytes(512+512)
+
+%:
+	echo abc; \
+	echo $$(pwd); eval $$(cat tools-env.sh); echo $$PATH; \
+	cd ESP8266_NONOS_SDK/examples; \
+	for i in bin lib ld tools Makefile; do ln -sf ../$$i ; done; \
+	for i in *; do \
+		if [ -r $$i/gen_misc.sh ]; then \
+			(cd $$i; \
+			    [ $@ = examples ] && \
+			       (   make clean \
+			        && echo $(GENMISC) | bash ./gen_misc.sh \
+			        && cp ../bin/eagle.flash.bin                0x00000 \
+			        && cp ../bin/eagle.irom0text.bin            0x10000 \
+			        && cp ../bin/blank.bin                     0x3FB000 \
+			        && cp ../bin/esp_init_data_default_v08.bin 0x3FC000 \
+			        && cp ../bin/blank.bin                     0x3FE000 \
+			        && echo "esptool.py write_flash $$(for j in 0x*; do echo -n "$$j $$j "; done)" > runme-flashme \
+			        && echo "esptool.pu erase_flash" > runme-flasherase \
+			        && chmod +x runme-* \
+			        ;true ) \
+			 || $(MAKE) $@; ); \
+		fi; \
+	done
