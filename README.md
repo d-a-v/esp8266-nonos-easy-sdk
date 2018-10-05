@@ -21,37 +21,37 @@ the 'make flash' command.
 
 *builds nonos-sdk examples only*
 
-# use it
+# Use it
 
-clone this repository, then type
+clone this repository, then
 ```
-make
+$ edit makefile.configureme
+$ make
+$ ./builds/IoT_Demo/minicom+flashme
 ```
 
 Everything should download, build (including all SDK examples).
 
-In every example directory, flash scripts will be provided.
-Use the generated `tools-env.sh`:
+In every example directory, flash and log scripts are built,
+and serial data will be stored into `output.txt` when run with `minicom` or `screen`.
 
-```
-make
-. tools-env.sh
-cd builds/IoT_Demo
-./runme-flasherase
-./runme-flashme
-```
+To exit from `minicom`: `^A ^X (yes)`
+
+To exit from `screen`: `^A k (yes)`
 
 build directory:
 ```
- 35136 Oct  5 21:56 0x0
-  4096 Oct  5 21:56 0x003FB000
-   128 Oct  5 21:56 0x003FC000
-  4096 Oct  5 21:56 0x003FE000
-232780 Oct  5 21:56 0x10000
-469540 Oct  5 21:56 IoT_Demo.elf
-   189 Oct  5 21:56 map.txt
-    23 Oct  5 21:56 runme-flasherase
-   101 Oct  5 21:56 runme-flashme
+  35136 Oct  5 23:48 0x0
+   4096 Oct  5 23:48 0x003FB000
+    128 Oct  5 23:48 0x003FC000
+   4096 Oct  5 23:48 0x003FE000
+ 232780 Oct  5 23:48 0x10000
+ 469540 Oct  5 23:48 IoT_Demo.elf
+     57 Oct  5 23:48 eraseme
+    135 Oct  5 23:48 flashme
+    195 Oct  5 23:48 map.txt
+     98 Oct  5 23:48 minicom+flashme
+     97 Oct  5 23:48 screen+flashme
 ```
 
 map.txt:
@@ -60,5 +60,5 @@ blank: 0x003FB000 & 0x003FE000
 esp_init_data_default_v08.bin: 0x003FC000
 eagle.flash.bin: 0x0
 eagle.irom0text.bin: 0x10000
-according to 4.1.2 in 2a-esp8266-sdk_getting_started_guide_en.pdf
+according to 4.1.2/4.2.2 in 2a-esp8266-sdk_getting_started_guide_en.pdf
 ```

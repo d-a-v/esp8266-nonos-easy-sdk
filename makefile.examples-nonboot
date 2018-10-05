@@ -9,39 +9,12 @@
 # eagle.flash.bin                                 0x00000
 # eagle.irom0text.bin                             0x10000
 
+boot = eagle.flash.bin
 default = esp_init_data_default_v08.bin
+userbin = eagle.irom0text.bin
 
 base   = $(shell printf "0x%08X" $$((($(SIZE) * 1024) - 0x10000)))
 blank1 = $(shell printf "0x%08X" $$(($(base) + 0xB000)))
 init   = $(shell printf "0x%08X" $$(($(base) + 0xC000)))
 blank2 = $(shell printf "0x%08X" $$(($(base) + 0xE000)))
-
-%:
-	eval $$(cat tools-env.sh); \
-	cd ESP8266_NONOS_SDK/examples; \
-	for i in bin lib ld tools Makefile; do \
-		ln -sf ../$$i; \
-	done; \
-	for i in $(examples); do \
-		if [ -r $$i/gen_misc.sh ]; then \
-			(cd $$i; \
-			    [ $@ = examples ] && \
-			       (   $(MAKE) $(OPTIONS) clean \
-			        && $(MAKE) $(OPTIONS) \
-			        && build=../../../builds/$$i \
-			        && mkdir -p $${build} \
-			        && cp ../bin/eagle.flash.bin      $${build}/0x0 \
-			        && cp ../bin/eagle.irom0text.bin  $${build}/0x10000 \
-			        && cp ../bin/blank.bin            $${build}/$(blank1) \
-			        && cp ../bin/$(default)           $${build}/$(init) \
-			        && cp ../bin/blank.bin            $${build}/$(blank2) \
-			        && cp .output/eagle/debug/image/eagle.app.v6.out $${build}/$$i.elf \
-			        && echo "esptool.py write_flash --flash_freq $(TOOLSPI) --flash_mode `echo $(SPIMODE) | tr A-Z a-z` \$$(for j in 0x*; do echo -n \"\$$j \$$j \"; done)" > $${build}/runme-flashme \
-			        && echo "esptool.py erase_flash" > $${build}/runme-flasherase \
-			        && echo "blank: $(blank1) & $(blank2)\n$(default): $(init)\neagle.flash.bin: 0x0\neagle.irom0text.bin: 0x10000\naccording to 4.1.2 in 2a-esp8266-sdk_getting_started_guide_en.pdf" > $${build}/map.txt \
-			        && chmod +x $${build}/runme-* \
-			        && chmod -x $${build}/0x* \
-			        ;true ) \
-			 || $(MAKE) $@; ); \
-		fi; \
-	done
+user   = 0x10000

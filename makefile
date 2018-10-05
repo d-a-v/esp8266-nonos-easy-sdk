@@ -19,10 +19,14 @@ esp-open-sdk/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc:
 env:
 	@echo "PATH=$$(pwd)/esp-open-sdk/xtensa-lx106-elf/bin:$$(pwd)/esptool:\$${PATH}; export PATH;" > tools-env.sh
 
-clean examples:
+clean:
+	$(MAKE) -f makefile.examples $@
+	rm -rf builds
+
+examples:
 	$(MAKE) -f makefile.examples $@
 	@echo "GENERATED:"
-	@ls -l builds/*/runme-flashme
+	@ls -l builds/*/*me
 
 doc:
 	[ -r 2a-esp8266-sdk_getting_started_guide_en.pdf ] || wget https://www.espressif.com/sites/default/files/documentation/2a-esp8266-sdk_getting_started_guide_en.pdf

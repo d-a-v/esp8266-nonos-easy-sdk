@@ -2,7 +2,7 @@
 include makefile.configureme
 
 ifeq ($(FLASH_MAP),0)
-SIZE = 512
+SIZE=512
 endif
 ifeq ($(FLASH_MAP),1)
 SIZE=512
@@ -42,7 +42,7 @@ ifeq ($(SIZE),)
 $(error FLASH_MAP not properly defined)
 endif
 
-OPTIONS= COMPILE=gcc BOOT=$(BOOT) APP=$(APP) SPI_SPEED=$(SPIMHZ) SPI_MODE=$(SPIMODE) SPI_SIZE_MAP=$(FLASH_MAP)
+OPTIONS= COMPILE=gcc BOOT=$(BOOTMODE) APP=$(PART) SPI_SPEED=$(SPIMHZ) SPI_MODE=$(SPIMODE) SPI_SIZE_MAP=$(FLASH_MAP)
 
 ifeq ($(BOOTMODE),none)
 include makefile.examples-nonboot
@@ -53,5 +53,37 @@ $(error old bootloader: todo)
 endif
 
 ifeq ($(BOOTMODE),new)
-$(error new bootloader: todo)
+include makefile.examples-newboot
 endif
+
+%:
+	eval $$(cat tools-env.sh); \
+	cd ESP8266_NONOS_SDK/examples; \
+	for i in bin lib ld tools Makefile; do \
+		ln -sf ../$$i; \
+	done; \
+	for i in $(examples); do \
+		if [ -r $$i/gen_misc.sh ]; then \
+			(cd $$i; \
+			    [ $@ = examples ] && \
+			       (   $(MAKE) $(OPTIONS) clean \
+			        && $(MAKE) $(OPTIONS) \
+			        && build=../../../builds/$$i \
+			        && mkdir -p $${build} \
+			        && cp ../bin/$(boot)    $${build}/0x0 \
+			        && cp ../bin/$(userbin) $${build}/$(user) \
+			        && cp ../bin/blank.bin  $${build}/$(blank1) \
+			        && cp ../bin/$(default) $${build}/$(init) \
+			        && cp ../bin/blank.bin  $${build}/$(blank2) \
+			        && cp .output/eagle/debug/image/eagle.app.v6.out $${build}/$$i.elf \
+			        && echo "cd \$${0%/*}; . ../../tools-env.sh; esptool.py write_flash --flash_freq $(TOOLSPI) --flash_mode `echo $(SPIMODE) | tr A-Z a-z` \$$(for j in 0x*; do echo -n \"\$$j \$$j \"; done)" > $${build}/flashme \
+			        && echo "cd \$${0%/*}; . ../../tools-env.sh; esptool.py erase_flash" > $${build}/eraseme \
+			        && echo "cd \$${0%/*}; . ../../tools-env.sh; ./flashme && screen -Logfile output.txt -L /dev/ttyUSB0 115200" > $${build}/screen+flashme \
+			        && echo "cd \$${0%/*}; . ../../tools-env.sh; ./flashme && minicom -o -C output.txt -D /dev/ttyUSB0 -b 115200" > $${build}/minicom+flashme \
+			        && echo "blank: $(blank1) & $(blank2)\n$(default): $(init)\n$(boot): 0x0\n$(userbin): $(user)\naccording to 4.1.2/4.2.2 in 2a-esp8266-sdk_getting_started_guide_en.pdf" > $${build}/map.txt \
+			        && chmod +x $${build}/*me \
+			        && chmod -x $${build}/0x* \
+			        ;true ) \
+			 || $(MAKE) $@; ); \
+		fi; \
+	done

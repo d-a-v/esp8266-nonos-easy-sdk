@@ -1,0 +1,61 @@
+
+# doc: 2a-esp8266-sdk_getting_started_guide_en.pdf
+# section 4.2.2 (OTA mode)
+
+#                              512     1024       2048                4096        8192    16384
+#                              512     1024   512+512  1K+1K    512+512  1K+1K   1K+1K    1K+1K
+#     flash map                   0       2       3        5        4        6       8        9
+# blank.bin                    0x7B000  0xFB000    0x1FB000          0x3FB000     0x7FB000 0xFFB000
+# esp_init_data_default.bin    0x7C000  0xFC000    0x1FC000          0x3FC000     0x7FC000 0xFFC000
+# blank.bin                    0x7E000  0xFE000    0x1FE000          0x3FE000     0x7FE000 0xFFE000
+# boot.bin                                                  0x00000
+# user1.bin                                                 0x01000
+# user2.bin                    0x41000 0x81000  0x81000 0x101000  0x81000 0x101000 0x101000 0x101000
+
+boot = boot_v1.7.bin
+default = esp_init_data_default_v08.bin
+userbin = upgrade/user$(PART).$(SIZE).new.$(FLASH_MAP).bin
+
+base   = $(shell printf "0x%08X" $$((($(SIZE) * 1024) - 0x10000)))
+blank1 = $(shell printf "0x%08X" $$(($(base) + 0xB000)))
+init   = $(shell printf "0x%08X" $$(($(base) + 0xC000)))
+blank2 = $(shell printf "0x%08X" $$(($(base) + 0xE000)))
+
+user1 = 0x01000
+ifeq ($(FLASH_MAP),0)
+user2 = 0x41000
+endif
+ifeq ($(FLASH_MAP),2)
+user2 = 0x81000
+endif
+ifeq ($(FLASH_MAP),3)
+user2 = 0x81000
+endif
+ifeq ($(FLASH_MAP),5)
+user2 = 0x101000
+endif
+ifeq ($(FLASH_MAP),4)
+user2 = 0x81000
+endif
+ifeq ($(FLASH_MAP),6)
+user2 = 0x101000
+endif
+ifeq ($(FLASH_MAP),8)
+user2 = 0x101000
+endif
+ifeq ($(FLASH_MAP),9)
+user2 = 0x101000
+endif
+ifeq ($(user2),)
+$(error new boot and flash map)
+endif
+
+ifeq ($(PART),1)
+user = $(user1)
+endif
+ifeq ($(PART),2)
+user = $(user2)
+endif
+ifeq ($(user),)
+$(error new boot and PART)
+endif

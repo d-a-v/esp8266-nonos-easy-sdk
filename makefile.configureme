@@ -25,7 +25,7 @@ SPIMHZ = 40
 # (DOUT is slightly slower and compatible with QOUT)
 # esp8285: DOUT only
 #
-SPIMODE = DOUT
+SPIMODE = QOUT
 
 #
 # FLASH_MAP - flash size and mapping
@@ -47,7 +47,7 @@ FLASH_MAP = 4
 # examples to compile
 # (use * for all)
 #
-#examples="IoT_Demo" # only
-examples=*
+examples="IoT_Demo" # only
+#examples=*
 
 ###########################################################################
