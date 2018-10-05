@@ -47,7 +47,7 @@ FLASH_MAP = 4
 # examples to compile
 # (use * for all)
 #
-#examples="IoT_Demo" # only
-examples=*
+examples="IoT_Demo" # only
+#examples=*
 
 ###########################################################################

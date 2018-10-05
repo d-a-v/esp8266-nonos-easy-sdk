@@ -9,7 +9,7 @@
 # eagle.flash.bin                                 0x00000
 # eagle.irom0text.bin                             0x10000
 
-init   = esp_init_data_default_v08.bin
+default = esp_init_data_default_v08.bin
 
 base   = $(shell printf "0x%08X" $$((($(SIZE) * 1024) - 0x10000)))
 blank1 = $(shell printf "0x%08X" $$(($(base) + 0xB000)))
@@ -18,7 +18,6 @@ blank2 = $(shell printf "0x%08X" $$(($(base) + 0xE000)))
 
 %:
 	eval $$(cat tools-env.sh); \
-	xtensa-lx106-elf-gcc -v; \
 	cd ESP8266_NONOS_SDK/examples; \
 	for i in bin lib ld tools Makefile; do \
 		ln -sf ../$$i; \
@@ -34,10 +33,8 @@ blank2 = $(shell printf "0x%08X" $$(($(base) + 0xE000)))
 			        && cp ../bin/eagle.flash.bin      $${build}/0x000000 \
 			        && cp ../bin/eagle.irom0text.bin  $${build}/0x010000 \
 			        && cp ../bin/blank.bin            $${build}/$(blank1) \
-			        && cp ../bin/$(init)              $${build}/$(init) \
+			        && cp ../bin/$(default)           $${build}/$(init) \
 			        && cp ../bin/blank.bin            $${build}/$(blank2) \
-			        && cp ../bin/eagle.S              $${build}/ \
-			        && cp ../bin/eagle.dump           $${build}/ \
 			        && cp .output/eagle/debug/image/eagle.app.v6.out $${build}/$$i.elf \
 			        && echo "esptool.py write_flash --flash_freq $(TOOLSPI) --flash_mode `echo $(SPIMODE) | tr A-Z a-z` \$$(for j in 0x*; do echo -n \"\$$j \$$j \"; done)" > $${build}/runme-flashme \
 			        && echo "esptool.py erase_flash" > $${build}/runme-flasherase \
