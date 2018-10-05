@@ -14,3 +14,26 @@ the 'make flash' command.
 * The compiler is built from the esp-open-sdk project
 * The flasher is espressif's official esptool.py
 * The firmware is esp-nonos-sdk v3
+
+# Current status
+
+*only SDK examples are built for 4MBytes chips in non-ota mode.*
+
+# test it
+
+clone this repository, then type
+```
+make
+```
+
+Everything should download, build (including all SDK examples).
+
+In every example directory, flash scripts will be provided.
+Use the generated `tools-env.sh`:
+```
+make
+. tools-env.sh
+cd ESP8266_NONOS_SDK/examples/IoT_Demo
+./runme-flasherase
+./runme-flashme
+```
