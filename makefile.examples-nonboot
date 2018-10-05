@@ -13,7 +13,6 @@
 GENMISC = "2\n0\n2\n3\n4\n" # nonboot / eagle / spi40Mhz / DOUT / 4MBytes(512+512)
 
 %:
-	echo abc; \
 	echo $$(pwd); eval $$(cat tools-env.sh); echo $$PATH; \
 	cd ESP8266_NONOS_SDK/examples; \
 	for i in bin lib ld tools Makefile; do ln -sf ../$$i ; done; \
@@ -29,7 +28,7 @@ GENMISC = "2\n0\n2\n3\n4\n" # nonboot / eagle / spi40Mhz / DOUT / 4MBytes(512+51
 			        && cp ../bin/esp_init_data_default_v08.bin 0x3FC000 \
 			        && cp ../bin/blank.bin                     0x3FE000 \
 			        && echo "esptool.py write_flash $$(for j in 0x*; do echo -n "$$j $$j "; done)" > runme-flashme \
-			        && echo "esptool.pu erase_flash" > runme-flasherase \
+			        && echo "esptool.py erase_flash" > runme-flasherase \
 			        && chmod +x runme-* \
 			        ;true ) \
 			 || $(MAKE) $@; ); \
