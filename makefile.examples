@@ -1,0 +1,57 @@
+
+include makefile.configureme
+
+ifeq ($(FLASH_MAP),0)
+SIZE = 512
+endif
+ifeq ($(FLASH_MAP),1)
+SIZE=512
+endif
+ifeq ($(FLASH_MAP),2)
+SIZE=1024
+endif
+ifeq ($(FLASH_MAP),3)
+SIZE=2048
+endif
+ifeq ($(FLASH_MAP),4)
+SIZE=4096
+endif
+ifeq ($(FLASH_MAP),5)
+SIZE=2048
+endif
+ifeq ($(FLASH_MAP),6)
+SIZE=4096
+endif
+ifeq ($(FLASH_MAP),7)
+SIZE=4096
+endif
+ifeq ($(FLASH_MAP),8)
+SIZE=8192
+endif
+ifeq ($(FLASH_MAP),9)
+SIZE=16384
+endif
+
+ifeq ($(SPIMHZ),26.7)
+TOOLSPI=26m
+else
+TOOLSPI=$(SPIMHZ)m
+endif
+
+ifeq ($(SIZE),)
+$(error FLASH_MAP not properly defined)
+endif
+
+OPTIONS= COMPILE=gcc BOOT=$(BOOT) APP=$(APP) SPI_SPEED=$(SPIMHZ) SPI_MODE=$(SPIMODE) SPI_SIZE_MAP=$(FLASH_MAP)
+
+ifeq ($(BOOTMODE),none)
+include makefile.examples-nonboot
+endif
+
+ifeq ($(BOOTMODE),old)
+$(error old bootloader: todo)
+endif
+
+ifeq ($(BOOTMODE),new)
+$(error new bootloader: todo)
+endif

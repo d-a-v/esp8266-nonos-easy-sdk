@@ -1,7 +1,7 @@
 
-# flash map from 2a-esp8266-sdk_getting_started_guide_en.pdf (non boot mode)
-
-# Binaries
+# doc: 2a-esp8266-sdk_getting_started_guide_en.pdf
+# section 4.1.2 (non OTA mode)
+#
 #                              512     1024     2048     4096     8192  16*1024
 # blank.bin                  0x7B000 0xFB000 0x1FB000 0x3FB000 0x7FB000 0xFFB000
 # esp_init_data_default.bin  0x7C000 0xFC000 0x1FC000 0x3FC000 0x7FC000 0xFFC000
@@ -9,27 +9,41 @@
 # eagle.flash.bin                                 0x00000
 # eagle.irom0text.bin                             0x10000
 
+init   = esp_init_data_default_v08.bin
 
-GENMISC = "2\n0\n2\n3\n4\n" # nonboot / eagle / spi40Mhz / DOUT / 4MBytes(512+512)
+base   = $(shell printf "0x%08X" $$((($(SIZE) * 1024) - 0x10000)))
+blank1 = $(shell printf "0x%08X" $$(($(base) + 0xB000)))
+init   = $(shell printf "0x%08X" $$(($(base) + 0xC000)))
+blank2 = $(shell printf "0x%08X" $$(($(base) + 0xE000)))
 
 %:
-	echo $$(pwd); eval $$(cat tools-env.sh); echo $$PATH; \
+	eval $$(cat tools-env.sh); \
+	xtensa-lx106-elf-gcc -v; \
 	cd ESP8266_NONOS_SDK/examples; \
-	for i in bin lib ld tools Makefile; do ln -sf ../$$i ; done; \
-	for i in *; do \
+	for i in bin lib ld tools Makefile; do \
+		ln -sf ../$$i; \
+	done; \
+	for i in $(examples); do \
 		if [ -r $$i/gen_misc.sh ]; then \
 			(cd $$i; \
 			    [ $@ = examples ] && \
-			       (   make clean \
-			        && echo $(GENMISC) | bash ./gen_misc.sh \
-			        && cp ../bin/eagle.flash.bin                0x00000 \
-			        && cp ../bin/eagle.irom0text.bin            0x10000 \
-			        && cp ../bin/blank.bin                     0x3FB000 \
-			        && cp ../bin/esp_init_data_default_v08.bin 0x3FC000 \
-			        && cp ../bin/blank.bin                     0x3FE000 \
-			        && echo "esptool.py write_flash $$(for j in 0x*; do echo -n "$$j $$j "; done)" > runme-flashme \
-			        && echo "esptool.py erase_flash" > runme-flasherase \
-			        && chmod +x runme-* \
+			       (   $(MAKE) $(OPTIONS) clean \
+			        && $(MAKE) $(OPTIONS) \
+			        && build=../../../builds/$$i \
+			        && mkdir -p $${build} \
+			        && cp ../bin/eagle.flash.bin      $${build}/0x000000 \
+			        && cp ../bin/eagle.irom0text.bin  $${build}/0x010000 \
+			        && cp ../bin/blank.bin            $${build}/$(blank1) \
+			        && cp ../bin/$(init)              $${build}/$(init) \
+			        && cp ../bin/blank.bin            $${build}/$(blank2) \
+			        && cp ../bin/eagle.S              $${build}/ \
+			        && cp ../bin/eagle.dump           $${build}/ \
+			        && cp .output/eagle/debug/image/eagle.app.v6.out $${build}/$$i.elf \
+			        && echo "esptool.py write_flash --flash_freq $(TOOLSPI) --flash_mode `echo $(SPIMODE) | tr A-Z a-z` \$$(for j in 0x*; do echo -n \"\$$j \$$j \"; done)" > $${build}/runme-flashme \
+			        && echo "esptool.py erase_flash" > $${build}/runme-flasherase \
+			        && echo "blank: $(blank1) & $(blank2)\n$(init): $(init)\neagle.flash.bin: 0x000000\neagle.irom0text.bin: 0x010000\naccording to 4.1.2 in 2a-esp8266-sdk_getting_started_guide_en.pdf" > $${build}/map.txt \
+			        && chmod +x $${build}/runme-* \
+			        && chmod -x $${build}/0x* \
 			        ;true ) \
 			 || $(MAKE) $@; ); \
 		fi; \

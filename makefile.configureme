@@ -1,0 +1,53 @@
+###########################################################################
+# board configuration
+
+#
+# BOOTMODE:
+# none  (no bootloader)
+# old   (v1.1)
+# new   (v1.2+)
+#
+BOOTMODE = none
+
+#
+# PART: partition 1 or 2
+# (only used when boot mode is not "none")
+# 
+PART = 1
+
+#
+# SPIMHZ: 20 / 26.7 / 40 / 80
+#
+SPIMHZ = 40
+
+#
+# SPIMODE: QIO QOUT DIO DOUT
+# (DOUT is slightly slower and compatible with QOUT)
+# esp8285: DOUT only
+#
+SPIMODE = DOUT
+
+#
+# FLASH_MAP - flash size and mapping
+#
+# FLASH_MAP=0     # 512KBytes (256+256) (unsupported?)
+# FLASH_MAP=1     # 256KBytes (256)     (unsupported?)
+# FLASH_MAP=2     #   1MByte  (512+512)
+# FLASH_MAP=3     #   2MBytes (512+512)
+# FLASH_MAP=4     #   4MBytes (512+512)
+# FLASH_MAP=5     #   2MBytes (1024+1024)
+# FLASH_MAP=6     #   4MBytes (1024+1024)
+# FLASH_MAP=7     #   4MBytes (2048+2048) (nodemcu compatibility?)
+# FLASH_MAP=8     #   8MBytes (1024+1024)
+# FLASH_MAP=9     #  16MBytes (1024+1024)
+#
+FLASH_MAP = 4
+
+#
+# examples to compile
+# (use * for all)
+#
+#examples="IoT_Demo" # only
+examples=*
+
+###########################################################################
