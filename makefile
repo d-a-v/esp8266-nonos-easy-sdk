@@ -17,7 +17,7 @@ esp-open-sdk/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc:
 	$(MAKE) -C esp-open-sdk
 
 env:
-	@echo "PATH=$$(pwd)/esp-open-sdk/xtensa-lx106-elf/bin:$$(pwd)/esptool:\$${PATH}; export PATH;" > tools-env.sh
+	@echo "PATH=$$(pwd)/esptool:$$(pwd)/esp-open-sdk/xtensa-lx106-elf/bin:\$${PATH}; export PATH;" > tools-env.sh
 
 clean:
 	$(MAKE) -f makefile.examples $@

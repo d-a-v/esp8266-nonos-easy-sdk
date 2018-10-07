@@ -42,7 +42,7 @@ ifeq ($(SIZE),)
 $(error FLASH_MAP not properly defined)
 endif
 
-OPTIONS= COMPILE=gcc BOOT=$(BOOTMODE) APP=$(PART) SPI_SPEED=$(SPIMHZ) SPI_MODE=$(SPIMODE) SPI_SIZE_MAP=$(FLASH_MAP)
+OPTIONS= COMPILE=gcc BOOT=$(BOOTMODE) APP=$(PART) SPI_SPEED=$(SPIMHZ) SPI_MODE=$(SPIMODE) SPI_SIZE_MAP=$(FLASH_MAP) EXTRA_CCFLAGS="-DLED_PIN=$(LED_PIN)"
 
 ifeq ($(BOOTMODE),none)
 include makefile.examples-nonboot
@@ -58,17 +58,19 @@ endif
 
 %:
 	eval $$(cat tools-env.sh); \
+	cp -a localexamples/* ESP8266_NONOS_SDK/examples; \
 	cd ESP8266_NONOS_SDK/examples; \
 	for i in bin lib ld tools Makefile; do \
 		ln -sf ../$$i; \
 	done; \
 	for i in $(examples); do \
-		if [ -r $$i/gen_misc.sh ]; then \
+		if [ -r $$i/Makefile ]; then \
 			(cd $$i; \
 			    [ $@ = examples ] && \
 			       (   $(MAKE) $(OPTIONS) clean \
 			        && $(MAKE) $(OPTIONS) \
 			        && build=../../../builds/$$i \
+			        && rm -rf $${build} \
 			        && mkdir -p $${build} \
 			        && cp ../bin/$(boot)    $${build}/0x0 \
 			        && cp ../bin/$(userbin) $${build}/$(user) \

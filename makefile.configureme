@@ -1,6 +1,11 @@
 ###########################################################################
 # board configuration
 
+# wemos-d1/esp-12e: 2
+# esp-01: 1
+#
+LED_PIN = 2
+
 #
 # BOOTMODE:
 # none  (no bootloader)
@@ -47,7 +52,8 @@ FLASH_MAP = 4
 # examples to compile
 # (use * for all)
 #
-examples="IoT_Demo" # only
+#examples="IoT_Demo" # only
+examples="blinky" # only
 #examples=*
 
 ###########################################################################
