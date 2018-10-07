@@ -17,7 +17,9 @@ the 'make flash' command.
 
 # Current status
 
-*builds nonos-sdk examples only (ota / non-ota)*
+*builds nonos-sdk examples/ (not really tested) and localexamples/ *
+
+*with localexamples/blinky, serial configuration is not reliable*
 
 # Use it
 

@@ -1,6 +1,7 @@
 ###########################################################################
 # board configuration
 
+# led:
 # wemos-d1/esp-12e: 2
 # esp-01: 1
 #
@@ -9,7 +10,7 @@ LED_PIN = 2
 #
 # BOOTMODE:
 # none  (no bootloader)
-# old   (v1.1)
+# old   (v1.1) (not supported yet)
 # new   (v1.2+)
 #
 BOOTMODE = none

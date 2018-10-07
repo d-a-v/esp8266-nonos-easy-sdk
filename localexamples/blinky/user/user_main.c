@@ -25,26 +25,6 @@
 #include "osapi.h"
 #include "user_interface.h"
 
-#if 0
-#include "uart-code.h"
-#define uart0_init(x) do { UART_SetBaudrate(0, x); UART_SetWordLength(0, 8); UART_SetParity(0, NONE_BITS); UART_SetStopBits(0, 1); } while (0)
-#else
-#include <eagle_soc.h>
-#include <uart_register.h>
-void ICACHE_FLASH_ATTR
-uart0_init(int br)
-{
-    uart_div_modify(0, UART_CLK_FREQ / br);
-#if 0
-    WRITE_PERI_REG(UART_CONF0(0), ((1 & UART_PARITY_EN_M)  <<  UART_PARITY_EN_S) //SET BIT AND PARITY MODE
-                                  | ((0 & UART_PARITY_M)  <<UART_PARITY_S )
-                                  | ((1 & UART_STOP_BIT_NUM) << UART_STOP_BIT_NUM_S)
-                                  | ((8 & UART_BIT_NUM) << UART_BIT_NUM_S));
-#endif
-}
-#endif
-
-
 #if ((SPI_FLASH_SIZE_MAP == 0) || (SPI_FLASH_SIZE_MAP == 1))
 #error "The flash map is not supported"
 #elif (SPI_FLASH_SIZE_MAP == 2)
@@ -90,29 +70,55 @@ static const partition_item_t at_partition_table[] = {
     { SYSTEM_PARTITION_SYSTEM_PARAMETER, 				SYSTEM_PARTITION_SYSTEM_PARAMETER_ADDR, 			0x3000},
 };
 
+//////////////////////////////////////////////////
+
 #define WAIT() do { volatile int i; for (i = 0; i < 0xfffff; i++) (void)i; } while (0)
+//#define WAIT() do { (void)0; } while (0)
+
+#include <eagle_soc.h>
+#include <uart_register.h>
+#include "uart.h"
+
+// cannot have something reliable,
+// sometimes print does not work, somtimes blink does not work
+#define TEST_SERIAL_PRE  0
+#define TEST_SERIAL_POST 0
+
+void uart0_sdkinit(br)
+{
+    uart_init(br, br);
+}
+
+void ICACHE_FLASH_ATTR uart0_clkinit(int br)
+{
+    uart_div_modify(0, UART_CLK_FREQ / br);
+}
 
 void ICACHE_FLASH_ATTR user_pre_init(void)
 {
+#if TEST_SERIAL_PRE
     WAIT();
     WAIT();
 
     os_printf("\r\n\r\nHello world1 (user_pre_init1)\r\n");
     WAIT();
+#endif
 
     if(!system_partition_table_regist(at_partition_table, sizeof(at_partition_table)/sizeof(at_partition_table[0]),SPI_FLASH_SIZE_MAP)) {
 		os_printf("system_partition_table_regist fail\r\n");
 		while(1);
 	}
 
+#if TEST_SERIAL_PRE
     os_printf("\r\n\r\nHello world2 (user_pre_init2)\r\n");
     WAIT();
 
-    uart0_init(115200);
+    uart0_clkinit(115200);
     WAIT();
 
     os_printf("\r\n\r\nHello world3 (user_pre_init3)\r\n");
     WAIT();
+#endif
 }
 
 
@@ -140,11 +146,23 @@ void some_timerfunc(void *arg)
 
 void ICACHE_FLASH_ATTR user_init()
 {
+#if TEST_SERIAL_PRE
   os_printf("\r\n\r\nHello world4 (user_init1)\r\n");
   WAIT();
 
+  uart0_clkinit(115200);
+  WAIT();
+  
   os_printf("\r\n\r\nHello world5 (user_init2)\r\n");
   WAIT();
+#endif
+
+#if TEST_SERIAL_POST
+  uart0_sdkinit(115200);
+
+  os_printf("\r\n\r\nHello world6 (user_init3)\r\n");
+  WAIT();
+#endif
 
   // init gpio subsytem
   gpio_init();
