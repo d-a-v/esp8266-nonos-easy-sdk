@@ -17,9 +17,7 @@ the 'make flash' command.
 
 # Current status
 
-*builds nonos-sdk examples/ (not really tested) and localexamples/ *
-
-*with localexamples/blinky, serial configuration is not reliable*
+*builds nonos-sdk examples/ and localexamples/ *
 
 # Use it
 
@@ -33,11 +31,9 @@ $ ./builds/IoT_Demo/minicom+flashme
 Everything should download, build (including all SDK examples).
 
 In every example directory, flash and log scripts are built,
-and serial data will be stored into `output.txt` when run with `minicom` or `screen`.
+and serial data will displayed (default @74880/8n1) when run with `miniterm.py`.
 
-To exit from `minicom`: `^A ^X (yes)`
-
-To exit from `screen`: `^A k (yes)`
+To exit from `miniterm.py`: `^]`
 
 build directory:
 ```
@@ -50,8 +46,7 @@ build directory:
      57 Oct  5 23:48 eraseme
     135 Oct  5 23:48 flashme
     195 Oct  5 23:48 map.txt
-     98 Oct  5 23:48 minicom+flashme
-     97 Oct  5 23:48 screen+flashme
+     98 Oct  5 23:48 minitermpy+flashme
 ```
 
 map.txt:

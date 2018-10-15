@@ -78,10 +78,9 @@ endif
 			        && cp ../bin/$(default) $${build}/$(init) \
 			        && cp ../bin/blank.bin  $${build}/$(blank2) \
 			        && cp .output/eagle/debug/image/eagle.app.v6.out $${build}/$$i.elf \
-			        && echo "cd \$${0%/*}; . ../../tools-env.sh; esptool.py write_flash --flash_freq $(TOOLSPI) --flash_mode `echo $(SPIMODE) | tr A-Z a-z` \$$(for j in 0x*; do echo -n \"\$$j \$$j \"; done)" > $${build}/flashme \
-			        && echo "cd \$${0%/*}; . ../../tools-env.sh; esptool.py erase_flash" > $${build}/eraseme \
-			        && echo "cd \$${0%/*}; . ../../tools-env.sh; ./flashme && screen -Logfile output.txt -L /dev/ttyUSB0 115200" > $${build}/screen+flashme \
-			        && echo "cd \$${0%/*}; . ../../tools-env.sh; ./flashme && minicom -o -C output.txt -D /dev/ttyUSB0 -b 115200" > $${build}/minicom+flashme \
+			        && echo "set -x; cd \$${0%/*}; . ../../tools-env.sh; esptool.py write_flash --flash_freq $(TOOLSPI) --flash_mode `echo $(SPIMODE) | tr A-Z a-z` \$$(for j in 0x*; do echo -n \"\$$j \$$j \"; done)" > $${build}/flashme \
+			        && echo "set -x; cd \$${0%/*}; . ../../tools-env.sh; esptool.py erase_flash" > $${build}/eraseme \
+			        && echo "set -x; baud=\$${1:-74880}; cd \$${0%/*}; . ../../tools-env.sh; ./flashme && miniterm.py --raw /dev/ttyUSB0 \$$baud | tee output.txt; echo output.txt:; cat output.txt; echo" > $${build}/minitermpy+flashme \
 			        && echo "blank: $(blank1) & $(blank2)\n$(default): $(init)\n$(boot): 0x0\n$(userbin): $(user)\naccording to 4.1.2/4.2.2 in 2a-esp8266-sdk_getting_started_guide_en.pdf" > $${build}/map.txt \
 			        && chmod +x $${build}/*me \
 			        && chmod -x $${build}/0x* \
@@ -89,3 +88,7 @@ endif
 			 || $(MAKE) $@; ); \
 		fi; \
 	done
+
+#			        && echo "baud=\$${1:-115200}; cd \$${0%/*}; . ../../tools-env.sh; ./flashme && screen -Logfile output.txt -L /dev/ttyUSB0 \$$baud; echo output.txt:; cat output.txt; echo" > $${build}/screen+flashme \
+#			        && echo "baud=\$${1:-115200}; cd \$${0%/*}; . ../../tools-env.sh; ./flashme && minicom -o -C output.txt -D /dev/ttyUSB0 -b \$$baud; echo output.txt:; cat output.txt; echo" > $${build}/minicom+flashme \
+#			        && echo "baud=\$${1:-115200}; cd \$${0%/*}; . ../../tools-env.sh; ./flashme && miniterm.py /dev/ttyUSB0 \$$baud" > $${build}/miniterm+flashme \

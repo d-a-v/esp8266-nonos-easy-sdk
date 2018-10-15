@@ -31,7 +31,7 @@ SPIMHZ = 40
 # (DOUT is slightly slower and compatible with QOUT)
 # esp8285: DOUT only
 #
-SPIMODE = QOUT
+SPIMODE = DOUT
 
 #
 # FLASH_MAP - flash size and mapping

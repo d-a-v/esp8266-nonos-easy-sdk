@@ -83,16 +83,7 @@ static const partition_item_t at_partition_table[] = {
 // sometimes print does not work, somtimes blink does not work
 #define TEST_SERIAL_PRE  0
 #define TEST_SERIAL_POST 0
-
-void uart0_sdkinit(br)
-{
-    uart_init(br, br);
-}
-
-void ICACHE_FLASH_ATTR uart0_clkinit(int br)
-{
-    uart_div_modify(0, UART_CLK_FREQ / br);
-}
+#define BAUD 115200
 
 void ICACHE_FLASH_ATTR user_pre_init(void)
 {
@@ -113,9 +104,6 @@ void ICACHE_FLASH_ATTR user_pre_init(void)
     os_printf("\r\n\r\nHello world2 (user_pre_init2)\r\n");
     WAIT();
 
-    uart0_clkinit(115200);
-    WAIT();
-
     os_printf("\r\n\r\nHello world3 (user_pre_init3)\r\n");
     WAIT();
 #endif
@@ -129,8 +117,20 @@ void ICACHE_FLASH_ATTR user_pre_init(void)
 static const int pin = LED_PIN;
 static os_timer_t some_timer;
 
+int configured = 0;
+
 void some_timerfunc(void *arg)
 {
+  if (!configured)
+  {
+    // init gpio subsytem
+    gpio_init();
+    // configure UART TXD to be GPIO1, set as output
+    PIN_FUNC_SELECT(PERIPHS_IO_MUX_U0TXD_U, FUNC_GPIO1); 
+    gpio_output_set(0, 0, (1 << pin), 0);
+    configured = 1;
+  }
+
   //Do blinky stuff
   if (GPIO_REG_READ(GPIO_OUT_ADDRESS) & (1 << pin))
   {
@@ -150,28 +150,16 @@ void ICACHE_FLASH_ATTR user_init()
   os_printf("\r\n\r\nHello world4 (user_init1)\r\n");
   WAIT();
 
-  uart0_clkinit(115200);
-  WAIT();
-  
   os_printf("\r\n\r\nHello world5 (user_init2)\r\n");
   WAIT();
 #endif
 
 #if TEST_SERIAL_POST
-  uart0_sdkinit(115200);
-
   os_printf("\r\n\r\nHello world6 (user_init3)\r\n");
   WAIT();
 #endif
 
-  // init gpio subsytem
-  gpio_init();
-
-  // configure UART TXD to be GPIO1, set as output
-  PIN_FUNC_SELECT(PERIPHS_IO_MUX_U0TXD_U, FUNC_GPIO1); 
-  gpio_output_set(0, 0, (1 << pin), 0);
-
   // setup timer (500ms, repeating)
   os_timer_setfn(&some_timer, (os_timer_func_t *)some_timerfunc, NULL);
-  os_timer_arm(&some_timer, 100, 1);
+  os_timer_arm(&some_timer, 1000, 1);
 }
